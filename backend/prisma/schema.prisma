@@ -1,0 +1,464 @@
+// =============================================================
+// H-SPOT — Modelo de datos (Prisma + MySQL)
+// Cada "model" se convierte en una tabla de MySQL.
+// Los precios usan Decimal para evitar errores de redondeo (COP).
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enumeraciones (valores fijos permitidos) ----------
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  HOMBRE
+  MUJER
+  UNISEX
+}
+
+enum OrderStatus {
+  PENDIENTE_CONFIRMACION
+  CONFIRMADO
+  EN_PREPARACION
+  ENVIADO
+  ENTREGADO
+  CANCELADO
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+  REEMBOLSADO
+}
+
+enum InventoryMovementType {
+  STOCK_INICIAL
+  AJUSTE_ADMIN
+  RESERVA_PEDIDO
+  LIBERACION_PEDIDO
+}
+
+enum PromotionType {
+  PORCENTAJE
+  VALOR_FIJO
+}
+
+// ---------- Usuarios y cuentas ----------
+
+model User {
+  id                   Int           @id @default(autoincrement())
+  email                String        @unique @db.VarChar(191)
+  passwordHash         String        @db.VarChar(255)
+  fullName             String        @db.VarChar(120)
+  phone                String?       @db.VarChar(20)
+  role                 Role          @default(CUSTOMER)
+  status               AccountStatus @default(ACTIVE)
+  emailVerifiedAt      DateTime?
+  dataPolicyAcceptedAt DateTime
+  lastLoginAt          DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  addresses           Address[]
+  cart                Cart?
+  orders              Order[]
+  resetTokens         PasswordResetToken[]
+  verificationTokens  EmailVerificationToken[]
+  auditLogs           AuditLog[]
+  orderNotes          OrderNote[]
+  statusChanges       OrderStatusHistory[]
+  inventoryMovements  InventoryMovement[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Address {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  label        String?  @db.VarChar(60)
+  department   String   @db.VarChar(60)
+  city         String   @db.VarChar(80)
+  addressLine  String   @db.VarChar(200)
+  neighborhood String?  @db.VarChar(100)
+  notes        String?  @db.VarChar(300)
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique @db.VarChar(64) // solo se guarda el hash SHA-256, nunca el token
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Sesiones de inicio de sesión guardadas en MySQL (sobreviven a reinicios)
+model Session {
+  id        String   @id @db.VarChar(128)
+  data      String   @db.Text
+  userId    Int?
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@index([userId])
+}
+
+// ---------- Catálogo ----------
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(80)
+  slug        String    @unique @db.VarChar(100)
+  description String?   @db.VarChar(300)
+  imageUrl    String?   @db.VarChar(300)
+  sortOrder   Int       @default(0)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Collection {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(80)
+  slug        String    @unique @db.VarChar(100)
+  description String?   @db.VarChar(500)
+  imageUrl    String?   @db.VarChar(300)
+  isDrop      Boolean   @default(false)
+  releaseDate DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    ProductCollection[] // relación muchos a muchos con Product
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String   @db.VarChar(120)
+  slug           String   @unique @db.VarChar(140)
+  description    String   @db.Text
+  materials      String?  @db.Text
+  care           String?  @db.Text
+  price          Decimal  @db.Decimal(12, 2)
+  compareAtPrice Decimal? @db.Decimal(12, 2) // precio anterior (para mostrar descuento)
+  gender         Gender   @default(UNISEX)
+  categoryId     Int
+  active         Boolean  @default(true)
+  featured       Boolean  @default(false)
+  isNew          Boolean  @default(false)
+  isBestSeller   Boolean  @default(false)
+  salesCount     Int      @default(0) // unidades vendidas en pedidos confirmados (popularidad)
+  isDemo         Boolean  @default(false) // true = producto de demostración
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  category    Category         @relation(fields: [categoryId], references: [id])
+  collections ProductCollection[]
+  images      ProductImage[]
+  variants    ProductVariant[]
+  orderItems  OrderItem[]
+
+  @@index([active, createdAt])
+  @@index([categoryId])
+  @@index([gender])
+  @@index([price])
+  @@fulltext([name, description])
+}
+
+// Tabla intermedia producto <-> colección (con llave primaria propia,
+// requerida por proveedores de MySQL como Aiven)
+model ProductCollection {
+  productId    Int
+  collectionId Int
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([productId, collectionId])
+  @@index([collectionId])
+}
+
+model ProductImage {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  url        String   @db.VarChar(300) // URL pública (/uploads/...)
+  storageKey String   @db.VarChar(300) // nombre del archivo en el almacenamiento
+  alt        String   @db.VarChar(200)
+  color      String?  @db.VarChar(40) // si la foto corresponde a un color específico
+  sortOrder  Int      @default(0)
+  isDemo     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}
+
+model ProductVariant {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  sku       String   @unique @db.VarChar(60)
+  size      String   @db.VarChar(20)
+  color     String   @db.VarChar(40)
+  colorHex  String?  @db.VarChar(7)
+  stock     Int      @default(0) // unidades disponibles para vender
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product    Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  movements  InventoryMovement[]
+
+  @@unique([productId, size, color])
+  @@index([size])
+  @@index([color])
+}
+
+// ---------- Carrito (solo para usuarios con cuenta) ----------
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id        Int            @id @default(autoincrement())
+  cartId    Int
+  variantId Int
+  quantity  Int
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, variantId])
+}
+
+// ---------- Pedidos ----------
+
+model Order {
+  id                   Int           @id @default(autoincrement())
+  orderNumber          String        @unique @db.VarChar(20)
+  userId               Int?
+  status               OrderStatus   @default(PENDIENTE_CONFIRMACION)
+  paymentStatus        PaymentStatus @default(PENDIENTE)
+
+  // Datos del cliente y de entrega (copiados en el momento del pedido)
+  customerName         String        @db.VarChar(120)
+  email                String        @db.VarChar(191)
+  phone                String        @db.VarChar(20)
+  department           String        @db.VarChar(60)
+  city                 String        @db.VarChar(80)
+  address              String        @db.VarChar(200)
+  neighborhood         String?       @db.VarChar(100)
+  deliveryNotes        String?       @db.VarChar(300)
+  shareAddressWhatsapp Boolean       @default(false)
+
+  shippingMethodName   String?       @db.VarChar(80)
+  paymentMethod        String?       @db.VarChar(60)
+  promotionCode        String?       @db.VarChar(40)
+
+  subtotal             Decimal       @db.Decimal(12, 2)
+  discount             Decimal       @default(0) @db.Decimal(12, 2)
+  shippingCost         Decimal       @default(0) @db.Decimal(12, 2)
+  shippingDefined      Boolean       @default(false)
+  total                Decimal       @db.Decimal(12, 2)
+
+  idempotencyKey       String        @unique @db.VarChar(64) // evita pedidos duplicados
+  accessTokenHash      String        @db.VarChar(64)         // permite a un invitado ver su pedido
+  dataPolicyAcceptedAt DateTime
+  reservationExpiresAt DateTime?     // si nadie confirma antes, se libera el inventario
+  stockReleased        Boolean       @default(false)
+  confirmedAt          DateTime?
+  cancelledAt          DateTime?
+  paidAt               DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  user          User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  history       OrderStatusHistory[]
+  notes         OrderNote[]
+  movements     InventoryMovement[]
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@index([email])
+  @@index([userId])
+}
+
+// Copia "congelada" de cada prenda en el momento de la compra
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  productId   Int?
+  variantId   Int?
+  productName String   @db.VarChar(120)
+  sku         String   @db.VarChar(60)
+  size        String   @db.VarChar(20)
+  color       String   @db.VarChar(40)
+  imageUrl    String?  @db.VarChar(300)
+  unitPrice   Decimal  @db.Decimal(12, 2)
+  quantity    Int
+  lineTotal   Decimal  @db.Decimal(12, 2)
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderStatusHistory {
+  id          Int          @id @default(autoincrement())
+  orderId     Int
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  note        String?      @db.VarChar(300)
+  changedById Int?
+  createdAt   DateTime     @default(now())
+
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy User? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+model OrderNote {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  authorId  Int?
+  body      String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+// Cada cambio de inventario queda registrado aquí
+model InventoryMovement {
+  id         Int                   @id @default(autoincrement())
+  variantId  Int
+  type       InventoryMovementType
+  quantity   Int // positivo suma stock, negativo resta
+  stockAfter Int
+  orderId    Int?
+  userId     Int?
+  reason     String?               @db.VarChar(200)
+  createdAt  DateTime              @default(now())
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  order   Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  user    User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([variantId, createdAt])
+  @@index([orderId])
+}
+
+// ---------- Comercial y configuración ----------
+
+model Promotion {
+  id          Int           @id @default(autoincrement())
+  code        String        @unique @db.VarChar(40)
+  description String?       @db.VarChar(200)
+  type        PromotionType
+  value       Decimal       @db.Decimal(12, 2)
+  minSubtotal Decimal?      @db.Decimal(12, 2)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  maxUses     Int?
+  usedCount   Int           @default(0)
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ShippingMethod {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(80)
+  description String?  @db.VarChar(200)
+  price       Decimal  @db.Decimal(12, 2)
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Ajustes editables de la tienda (anuncio, hero, redes, WhatsApp, políticas...)
+model StoreSetting {
+  key       String   @id @db.VarChar(60)
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String   @db.VarChar(60)
+  entity    String   @db.VarChar(60)
+  entityId  String?  @db.VarChar(60)
+  details   Json?
+  ip        String?  @db.VarChar(64)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
+
+// Suscriptores al boletín (newsletter), con fecha de consentimiento
+model NewsletterSubscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(191)
+  consentAt DateTime
+  createdAt DateTime @default(now())
+}

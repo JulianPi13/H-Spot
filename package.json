@@ -1,0 +1,47 @@
+{
+  "name": "h-spot",
+  "version": "1.0.0",
+  "description": "Tienda H-SPOT (Express + Prisma + MySQL), lista para Vercel",
+  "main": "backend/server.js",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch backend/server.js",
+    "start": "node backend/server.js",
+    "postinstall": "prisma generate",
+    "vercel-build": "node backend/scripts/vercel-build.js",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "node backend/prisma/seed.js",
+    "db:studio": "prisma studio",
+    "create-admin": "node backend/scripts/create-admin.js",
+    "release-expired": "node backend/scripts/release-expired-orders.js",
+    "placeholders": "node backend/scripts/build-placeholders.js",
+    "test": "node --test --test-concurrency=1 backend/tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@vercel/blob": "^2.8.2",
+    "argon2": "^0.45.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.3",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.3.1",
+    "prisma": "^6.19.3",
+    "sharp": "^0.35.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
+  },
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma",
+    "seed": "node backend/prisma/seed.js"
+  }
+}

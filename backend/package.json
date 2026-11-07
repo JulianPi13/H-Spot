@@ -1,0 +1,43 @@
+{
+  "name": "h-spot-backend",
+  "version": "1.0.0",
+  "description": "Backend de la tienda H-SPOT (Express + Prisma + MySQL)",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "create-admin": "node scripts/create-admin.js",
+    "release-expired": "node scripts/release-expired-orders.js",
+    "placeholders": "node scripts/build-placeholders.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "argon2": "^0.45.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.3",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.3.1",
+    "sharp": "^0.35.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3",
+    "supertest": "^7.3.2"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}

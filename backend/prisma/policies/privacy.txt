@@ -1,0 +1,38 @@
+POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES — H-SPOT
+(Borrador base. Debe ser revisado por un abogado antes del lanzamiento.)
+
+1. RESPONSABLE DEL TRATAMIENTO
+[Razón social o nombre del titular del negocio], identificado con [NIT / cédula], con domicilio en [ciudad], correo [correo de contacto] y WhatsApp +57 301 322 3892, es responsable del tratamiento de los datos personales recolectados a través de la tienda en línea H-SPOT.
+
+2. MARCO LEGAL
+Esta política se rige por la Ley Estatutaria 1581 de 2012, el Decreto 1377 de 2013 (compilado en el Decreto Único 1074 de 2015) y demás normas colombianas sobre protección de datos personales.
+
+3. DATOS QUE RECOLECTAMOS
+- Datos de identificación y contacto: nombre completo, correo electrónico y número de teléfono.
+- Datos de entrega: departamento, ciudad o municipio, dirección, barrio e indicaciones de entrega.
+- Datos de la cuenta: correo y contraseña (la contraseña se guarda cifrada y nadie puede leerla).
+- Datos de los pedidos: productos, tallas, colores, cantidades, valores y método de pago preferido.
+No recolectamos ni almacenamos datos de tarjetas bancarias.
+
+4. FINALIDADES
+a) Gestionar pedidos, confirmar disponibilidad, coordinar el pago y la entrega.
+b) Comunicarnos contigo por WhatsApp, correo o teléfono sobre tus pedidos.
+c) Administrar tu cuenta de cliente e historial de compras.
+d) Atender peticiones, quejas, reclamos, cambios y devoluciones.
+e) Cumplir obligaciones legales, contables y tributarias.
+f) Solo si lo autorizas expresamente: enviarte novedades, lanzamientos y promociones.
+
+5. DERECHOS DEL TITULAR
+Como titular puedes: conocer, actualizar y rectificar tus datos; solicitar prueba de la autorización otorgada; ser informado sobre el uso que se ha dado a tus datos; presentar quejas ante la Superintendencia de Industria y Comercio; revocar la autorización y/o solicitar la supresión de tus datos cuando no exista un deber legal o contractual de conservarlos; y acceder gratuitamente a tus datos.
+
+6. CANALES DE ATENCIÓN
+Puedes ejercer tus derechos escribiendo a [correo de contacto] o al WhatsApp +57 301 322 3892. Las consultas se responderán en máximo diez (10) días hábiles y los reclamos en máximo quince (15) días hábiles, de acuerdo con la ley.
+
+7. SEGURIDAD
+Aplicamos medidas técnicas razonables: contraseñas cifradas, conexiones seguras (HTTPS), acceso restringido a la información de clientes y registro de las consultas administrativas.
+
+8. TRANSFERENCIA Y TRANSMISIÓN
+Tus datos solo se comparten con terceros cuando es necesario para cumplir las finalidades (por ejemplo, la empresa transportadora para la entrega) o cuando lo exija una autoridad.
+
+9. VIGENCIA
+Esta política rige desde [fecha]. Los datos se conservarán mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales.

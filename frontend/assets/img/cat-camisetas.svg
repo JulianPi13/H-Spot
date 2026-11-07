@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d5cf"/><stop offset="1" stop-color="#bdb9b1"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.18"/>
+  <ellipse cx="600" cy="1300" rx="360" ry="40" fill="#000" opacity="0.18" filter="url(#soft)"/>
+  <g transform="">
+    <path d="M370 330 L505 278 Q600 330 695 278 L830 330 L1010 520 L895 625 L845 575 L845 1185 L355 1185 L355 575 L305 625 L190 520 Z" fill="#E8E4DC"/>
+    <path d="M505 278 Q600 360 695 278" fill="none" stroke="#bbb7af" stroke-width="10"/>
+    <path d="M355 575 L355 600 M845 575 L845 600" stroke="#bbb7af" stroke-width="6"/>
+    <path d="M300 615 L190 520" stroke="#bbb7af" stroke-width="5" opacity=".6"/>
+    <path d="M900 615 L1010 520" stroke="#bbb7af" stroke-width="5" opacity=".6"/>
+    <path d="M355 1150 L845 1150" stroke="#bbb7af" stroke-width="5" opacity=".5"/></g>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.06"/>
+  <text x="60" y="1440" font-family="monospace" font-size="30" letter-spacing="4" fill="#3a3a3a">H-SPOT / FOTO PROVISIONAL</text>
+  <text x="1140" y="90" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="3" fill="#4a4a4a">CAMISETAS</text>
+</svg>

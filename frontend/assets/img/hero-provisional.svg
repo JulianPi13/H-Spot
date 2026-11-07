@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice"><defs>
+  <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <filter id="c"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="4" seed="7"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer></filter>
+  <linearGradient id="light" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="1920" height="1080" fill="#1a1a1a"/>
+<rect width="1920" height="1080" filter="url(#c)" opacity=".55"/>
+
+  <line x1="0" y1="260" x2="1920" y2="260" stroke="#0f0f0f" stroke-width="3"/><line x1="0" y1="530" x2="1920" y2="530" stroke="#0f0f0f" stroke-width="3"/><line x1="0" y1="800" x2="1920" y2="800" stroke="#0f0f0f" stroke-width="3"/><line x1="0" y1="1070" x2="1920" y2="1070" stroke="#0f0f0f" stroke-width="3"/>
+  <line x1="240" y1="0" x2="240" y2="1080" stroke="#0f0f0f" stroke-width="3"/><line x1="720" y1="0" x2="720" y2="1080" stroke="#0f0f0f" stroke-width="3"/><line x1="1200" y1="0" x2="1200" y2="1080" stroke="#0f0f0f" stroke-width="3"/><line x1="1680" y1="0" x2="1680" y2="1080" stroke="#0f0f0f" stroke-width="3"/><line x1="2160" y1="0" x2="2160" y2="1080" stroke="#0f0f0f" stroke-width="3"/>
+  <circle cx="690" cy="230" r="9" fill="#0d0d0d"/><circle cx="1650" cy="230" r="9" fill="#0d0d0d"/>
+  <polygon points="1100,0 1920,0 1920,1080 520,1080" fill="url(#light)"/>
+  <line x1="980" y1="150" x2="1660" y2="150" stroke="#777" stroke-width="5"/>
+  <g transform="translate(940 120) scale(.62)">
+    <path d="M480 320 Q465 160 600 140 Q735 160 720 320 Z" fill="#030303"/>
+    <path d="M375 360 L500 300 Q600 360 700 300 L825 360 Q950 520 995 1040 L895 1075 L845 640 L845 1170 L355 1170 L355 640 L305 1075 L205 1040 Q250 520 375 360 Z" fill="#0f0f0f"/>
+    <path d="M500 300 Q600 400 700 300" fill="none" stroke="#3a3a3a" stroke-width="10"/>
+    <path d="M575 360 L565 520 M625 360 L635 520" stroke="#3a3a3a" stroke-width="7" stroke-linecap="round"/>
+    <path d="M440 860 L760 860 L800 1040 L400 1040 Z" fill="none" stroke="#3a3a3a" stroke-width="7"/>
+    <rect x="355" y="1110" width="490" height="60" fill="#050505"/>
+    <rect x="200" y="1020" width="100" height="55" transform="rotate(8 250 1047)" fill="#050505"/>
+    <rect x="900" y="1020" width="100" height="55" transform="rotate(-8 950 1047)" fill="#050505"/></g>
+  <g transform="translate(1280 150) scale(.56)">
+    <path d="M370 330 L505 278 Q600 330 695 278 L830 330 L1010 520 L895 625 L845 575 L845 1185 L355 1185 L355 575 L305 625 L190 520 Z" fill="#d9d5cd"/>
+    <path d="M505 278 Q600 360 695 278" fill="none" stroke="#9a968f" stroke-width="10"/>
+    <path d="M355 575 L355 600 M845 575 L845 600" stroke="#9a968f" stroke-width="6"/>
+    <path d="M300 615 L190 520" stroke="#9a968f" stroke-width="5" opacity=".6"/>
+    <path d="M900 615 L1010 520" stroke="#9a968f" stroke-width="5" opacity=".6"/>
+    <path d="M355 1150 L845 1150" stroke="#9a968f" stroke-width="5" opacity=".5"/></g>
+  <rect x="0" y="960" width="1920" height="120" fill="#121212"/>
+  <text x="1880" y="1040" text-anchor="end" font-family="monospace" font-size="18" letter-spacing="4" fill="#8a8a8a">IMAGEN PROVISIONAL — REEMPLAZAR</text>
+<rect width="1920" height="1080" filter="url(#g)" opacity=".09"/>
+</svg>

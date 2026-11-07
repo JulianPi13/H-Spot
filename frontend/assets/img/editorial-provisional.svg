@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" width="1200" height="1400" preserveAspectRatio="xMidYMid slice"><defs>
+  <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <filter id="c"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="4" seed="7"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer></filter>
+  <linearGradient id="light" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="1200" height="1400" fill="#171717"/>
+<rect width="1200" height="1400" filter="url(#c)" opacity=".55"/>
+
+  <polygon points="0,0 1200,0 1200,500 0,900" fill="#202020"/>
+  <polygon points="300,0 1200,0 1200,1400 900,1400" fill="url(#light)"/>
+  <g transform="translate(180 260) scale(.72)">
+    <rect x="410" y="240" width="380" height="70" fill="#4f523e"/>
+    <path d="M410 310 L370 1280 L575 1280 L600 560 L625 1280 L830 1280 L790 310 Z" fill="#5B5E4A"/>
+    <path d="M600 310 L600 560" stroke="#2c2e22" stroke-width="7"/>
+    <rect x="360" y="700" width="120" height="170" rx="8" fill="#515440" stroke="#2c2e22" stroke-width="5"/>
+    <rect x="720" y="700" width="120" height="170" rx="8" fill="#515440" stroke="#2c2e22" stroke-width="5"/>
+    <path d="M370 1240 L575 1240 M625 1240 L830 1240" stroke="#2c2e22" stroke-width="6" opacity=".6"/>
+    <rect x="460" y="252" width="20" height="46" fill="#2c2e22" opacity=".5"/><rect x="720" y="252" width="20" height="46" fill="#2c2e22" opacity=".5"/></g>
+  <g transform="translate(560 160) scale(.6)">
+    <path d="M375 340 L520 290 L600 330 L680 290 L825 340 Q950 520 990 1030 L890 1060 L845 630 L845 1160 L355 1160 L355 630 L310 1060 L210 1030 Q250 520 375 340 Z" fill="#2E3A4D"/>
+    <path d="M520 290 L560 420 L600 330 L640 420 L680 290" fill="#1c283b" stroke="#141b26" stroke-width="5"/>
+    <path d="M600 330 L600 1160" stroke="#141b26" stroke-width="8"/>
+    <circle cx="600" cy="520" r="10" fill="#141b26"/><circle cx="600" cy="700" r="10" fill="#141b26"/><circle cx="600" cy="880" r="10" fill="#141b26"/>
+    <path d="M410 840 L520 840 M680 840 L790 840" stroke="#141b26" stroke-width="8" stroke-linecap="round"/></g>
+  <text x="40" y="1360" text-anchor="start" font-family="monospace" font-size="18" letter-spacing="4" fill="#8a8a8a">IMAGEN PROVISIONAL — REEMPLAZAR</text>
+<rect width="1200" height="1400" filter="url(#g)" opacity=".09"/>
+</svg>

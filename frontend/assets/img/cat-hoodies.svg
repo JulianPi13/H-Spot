@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d5cf"/><stop offset="1" stop-color="#bdb9b1"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.18"/>
+  <ellipse cx="600" cy="1300" rx="360" ry="40" fill="#000" opacity="0.18" filter="url(#soft)"/>
+  <g transform="">
+    <path d="M480 320 Q465 160 600 140 Q735 160 720 320 Z" fill="#090909"/>
+    <path d="M375 360 L500 300 Q600 360 700 300 L825 360 Q950 520 995 1040 L895 1075 L845 640 L845 1170 L355 1170 L355 640 L305 1075 L205 1040 Q250 520 375 360 Z" fill="#151515"/>
+    <path d="M500 300 Q600 400 700 300" fill="none" stroke="#424242" stroke-width="10"/>
+    <path d="M575 360 L565 520 M625 360 L635 520" stroke="#424242" stroke-width="7" stroke-linecap="round"/>
+    <path d="M440 860 L760 860 L800 1040 L400 1040 Z" fill="none" stroke="#424242" stroke-width="7"/>
+    <rect x="355" y="1110" width="490" height="60" fill="#0b0b0b"/>
+    <rect x="200" y="1020" width="100" height="55" transform="rotate(8 250 1047)" fill="#0b0b0b"/>
+    <rect x="900" y="1020" width="100" height="55" transform="rotate(-8 950 1047)" fill="#0b0b0b"/></g>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.06"/>
+  <text x="60" y="1440" font-family="monospace" font-size="30" letter-spacing="4" fill="#3a3a3a">H-SPOT / FOTO PROVISIONAL</text>
+  <text x="1140" y="90" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="3" fill="#4a4a4a">HOODIES</text>
+</svg>

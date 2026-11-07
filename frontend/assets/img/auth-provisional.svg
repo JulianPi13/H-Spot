@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1400" width="1000" height="1400" preserveAspectRatio="xMidYMid slice"><defs>
+  <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <filter id="c"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="4" seed="7"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer></filter>
+  <linearGradient id="light" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="1000" height="1400" fill="#1b1b1b"/>
+<rect width="1000" height="1400" filter="url(#c)" opacity=".55"/>
+
+  <polygon points="0,1400 1000,600 1000,1400" fill="#101010"/>
+  <polygon points="200,0 1000,0 1000,900" fill="url(#light)"/>
+  <g transform="translate(160 250) scale(.68)">
+    <path d="M480 320 Q465 160 600 140 Q735 160 720 320 Z" fill="#7e7e7a"/>
+    <path d="M375 360 L500 300 Q600 360 700 300 L825 360 Q950 520 995 1040 L895 1075 L845 640 L845 1170 L355 1170 L355 640 L305 1075 L205 1040 Q250 520 375 360 Z" fill="#8A8A86"/>
+    <path d="M500 300 Q600 400 700 300" fill="none" stroke="#4f4f4c" stroke-width="10"/>
+    <path d="M575 360 L565 520 M625 360 L635 520" stroke="#4f4f4c" stroke-width="7" stroke-linecap="round"/>
+    <path d="M440 860 L760 860 L800 1040 L400 1040 Z" fill="none" stroke="#4f4f4c" stroke-width="7"/>
+    <rect x="355" y="1110" width="490" height="60" fill="#80807c"/>
+    <rect x="200" y="1020" width="100" height="55" transform="rotate(8 250 1047)" fill="#80807c"/>
+    <rect x="900" y="1020" width="100" height="55" transform="rotate(-8 950 1047)" fill="#80807c"/></g>
+  <text x="40" y="1360" text-anchor="start" font-family="monospace" font-size="18" letter-spacing="4" fill="#8a8a8a">IMAGEN PROVISIONAL — REEMPLAZAR</text>
+<rect width="1000" height="1400" filter="url(#g)" opacity=".09"/>
+</svg>

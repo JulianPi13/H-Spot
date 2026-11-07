@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d5cf"/><stop offset="1" stop-color="#bdb9b1"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.18"/>
+  <ellipse cx="600" cy="1300" rx="360" ry="40" fill="#000" opacity="0.18" filter="url(#soft)"/>
+  <g transform="">
+    <path d="M330 860 Q330 520 600 500 Q870 520 870 860 Z" fill="#2A2A2A"/>
+    <path d="M300 860 Q600 820 900 860 Q980 880 1000 930 Q800 900 600 905 Q400 905 300 900 Z" fill="#181818"/>
+    <path d="M600 500 L600 860 M470 520 Q440 700 460 860 M730 520 Q760 700 740 860" stroke="#575757" stroke-width="5" fill="none"/>
+    <circle cx="600" cy="505" r="16" fill="#181818"/></g>
+  <rect width="1200" height="1500" filter="url(#grain)" opacity="0.06"/>
+  <text x="60" y="1440" font-family="monospace" font-size="30" letter-spacing="4" fill="#3a3a3a">H-SPOT / FOTO PROVISIONAL</text>
+  <text x="1140" y="90" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="3" fill="#4a4a4a">ACCESORIOS</text>
+</svg>
