@@ -23,9 +23,38 @@ if (missing.length) {
   console.error(`\nFALTA ${missing.join(' y ')}: configúrala(s) en Vercel > Settings > Environment Variables (ver docs/PUBLICAR-EN-VERCEL.md, Paso 1).\n`);
   process.exit(1);
 }
-const run = (cmd) => execSync(cmd, { cwd: ROOT, stdio: 'inherit', env: process.env });
+// Revisión de las direcciones de Supabase para fallar rápido y con un mensaje claro
+function check(name, url) {
+  let u;
+  try { u = new URL(url); } catch { return `${name} no es una dirección válida. Cópiala de nuevo desde Supabase > Connect.`; }
+  if (!/^postgres(ql)?:$/.test(u.protocol)) return `${name} debe empezar por postgresql://`;
+  if (/\[YOUR-PASSWORD\]/i.test(url) || /YOUR-PASSWORD/i.test(decodeURIComponent(u.password || ''))) return `${name} todavía tiene [YOUR-PASSWORD]: cámbialo por tu contraseña de Supabase.`;
+  if (/^db\..+\.supabase\.co$/.test(u.hostname)) return `${name} usa la conexión directa (db....supabase.co), que no funciona en Vercel. Usa la del "pooler" (contiene pooler.supabase.com).`;
+  if (name === 'DIRECT_URL' && (u.port === '6543' || u.searchParams.has('pgbouncer'))) return 'DIRECT_URL debe ser la del "Session pooler" (puerto 5432) y sin ?pgbouncer=true. Con el puerto 6543 la creación de tablas se queda esperando para siempre.';
+  if (name === 'DATABASE_URL' && u.port === '6543' && u.searchParams.get('pgbouncer') !== 'true') return 'A DATABASE_URL (puerto 6543) le falta ?pgbouncer=true&connection_limit=1 al final.';
+  return null;
+}
+const problems = [check('DATABASE_URL', process.env.DATABASE_URL), check('DIRECT_URL', process.env.DIRECT_URL)].filter(Boolean);
+if (problems.length) {
+  console.error('\nREVISA LAS VARIABLES EN VERCEL (Settings > Environment Variables):');
+  for (const p of problems) console.error(' - ' + p);
+  console.error('');
+  process.exit(1);
+}
+
+// Cada paso tiene tiempo máximo: si la base de datos no responde, el deploy falla en vez de quedarse esperando
+const run = (cmd, label, minutes = 3) => {
+  try {
+    execSync(cmd, { cwd: ROOT, stdio: 'inherit', env: process.env, timeout: minutes * 60 * 1000 });
+  } catch (err) {
+    if (err.code === 'ETIMEDOUT' || err.signal === 'SIGTERM') {
+      console.error(`\n${label} tardó más de ${minutes} minutos. Revisa DIRECT_URL (Session pooler, puerto 5432) y que el proyecto de Supabase no esté pausado.\n`);
+    }
+    process.exit(1);
+  }
+};
 // Se genera aquí también por si el instalador de npm omitió el paso automático de Prisma
-run('npx prisma generate');
-run('npx prisma migrate deploy');
-run('node backend/prisma/seed.js');
+run('npx prisma generate', 'Generar Prisma', 3);
+run('npx prisma migrate deploy', 'Crear/actualizar las tablas', 3);
+run('node backend/prisma/seed.js', 'Cargar datos iniciales', 5);
 console.log('Build de H-SPOT listo.');
