@@ -70,8 +70,9 @@ function deepMerge(base, extra) {
   return out;
 }
 
-async function getSetting(key) {
-  const row = await prisma.storeSetting.findUnique({ where: { key } });
+// db permite usarlo dentro de una transacción (misma conexión)
+async function getSetting(key, db = prisma) {
+  const row = await db.storeSetting.findUnique({ where: { key } });
   return deepMerge(DEFAULTS[key] ?? {}, row ? row.value : {});
 }
 

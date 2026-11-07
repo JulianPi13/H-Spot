@@ -1,7 +1,7 @@
 {
   "name": "h-spot",
   "version": "1.0.0",
-  "description": "Tienda H-SPOT (Express + Prisma + MySQL), lista para Vercel",
+  "description": "Tienda H-SPOT (Express + Prisma + PostgreSQL/Supabase), lista para Vercel",
   "main": "backend/server.js",
   "private": true,
   "scripts": {
@@ -43,5 +43,11 @@
   "prisma": {
     "schema": "backend/prisma/schema.prisma",
     "seed": "node backend/prisma/seed.js"
+  },
+  "allowScripts": {
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "prisma": true,
+    "argon2": true
   }
 }

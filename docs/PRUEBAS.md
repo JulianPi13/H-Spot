@@ -1,6 +1,6 @@
 # Pruebas obligatorias — resultados
 
-Se verificaron con **pruebas automáticas** (`npm test`, 26 pruebas sobre MySQL real) y con **pruebas en navegador** (Chromium automatizado, escritorio 1440 px y móvil 390 px).
+Se verificaron con **pruebas automáticas** (`npm test`, 26 pruebas sobre PostgreSQL real, también a través de un pooler en modo transacción como el de Supabase) y con **pruebas en navegador** (Chromium automatizado, escritorio 1440 px y móvil 390 px).
 
 | # | Prueba | Cómo se verificó | Resultado |
 |---|---|---|---|
@@ -14,7 +14,7 @@ Se verificaron con **pruebas automáticas** (`npm test`, 26 pruebas sobre MySQL 
 | 8 | Recuperar contraseña | Sin SMTP: responde que no está habilitado (no simula). Token de un solo uso y vencimiento: `auth.test.js`. Modo desarrollo: enlace impreso en la terminal | OK (falta configurar SMTP real) |
 | 9 | Checkout como invitado | Navegador móvil completo + `orders.test.js` | OK |
 | 10 | Checkout con cuenta | Navegador (datos prellenados, método de pago) + `auth.test.js` | OK |
-| 11 | Crear pedido y verificarlo en MySQL | `orders.test.js` lee `Order`, `OrderItem`, `InventoryMovement` | OK |
+| 11 | Crear pedido y verificarlo en la base de datos | `orders.test.js` lee `Order`, `OrderItem`, `InventoryMovement` | OK |
 | 12 | Abrir WhatsApp con el resumen | Navegador: se abrió `wa.me/573013223892` con el mensaje; botones "Abrir" y "Copiar" en la página del pedido | OK |
 | 13 | Evitar pedidos duplicados | Mismo envío dos veces = mismo pedido, stock descontado una vez | OK |
 | 14 | Precio calculado en el servidor | Se envió `price: 1` y el servidor usó $150.000 | OK |
@@ -41,7 +41,8 @@ Prueba manual recomendada antes de lanzar: hacer un pedido real desde un celular
 
 ## Pruebas de la versión para Vercel
 
-- Se ejecutó el mismo proceso de publicación de Vercel (`npm run vercel-build`) contra un MySQL configurado como Aiven (exige llave primaria en todas las tablas): tablas creadas y productos de demostración cargados.
+- Se ejecutó el mismo proceso de publicación de Vercel (`npm run vercel-build`) con PostgreSQL detrás de PgBouncer en modo transacción y una sola conexión (igual que Supabase en Vercel): tablas creadas y productos de demostración cargados. Esta prueba encontró y permitió corregir una consulta que se bloqueaba con una sola conexión.
 - Se simuló el enrutamiento de Vercel (archivos de `public/` primero, el resto a `api/index.js`, HTTPS por proxy): compra como invitado completa, filtros, carrito, creación del primer administrador desde `/configuracion-inicial`, panel y subida de fotos de una en una.
 - El guardado de fotos en Vercel Blob se probó con una simulación del servicio (subir, rechazar archivos falsos y borrar). La prueba con Blob real se hace al publicar (Paso 4 de la guía).
 - Pruebas automáticas nuevas: configuración inicial (clave obligatoria, un solo uso) y tarea programada (exige `CRON_SECRET`).
+- Se instaló el proyecto con npm 12 (el que usa Vercel), que bloquea scripts de instalación no autorizados: con `allowScripts` en `package.json`, Prisma y argon2 se instalan correctamente.

@@ -1,6 +1,6 @@
 // Carrito.
 // - Invitados: el carrito vive en el navegador y se "cotiza" aquí (POST /api/cart/quote).
-// - Usuarios con cuenta: el carrito se guarda en MySQL (tablas Cart y CartItem).
+// - Usuarios con cuenta: el carrito se guarda en la base de datos (tablas Cart y CartItem).
 const prisma = require('../config/prisma');
 const { priceLines, computeTotals, serializeQuote, mergeItems } = require('../services/pricing.service');
 const { notFound, badRequest } = require('../utils/errors');

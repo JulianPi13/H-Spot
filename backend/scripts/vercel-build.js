@@ -18,11 +18,14 @@ for (const dir of ['css', 'js', 'assets']) fs.cpSync(path.join(FRONT, dir), path
 fs.cpSync(path.join(FRONT, 'admin'), path.join(OUT, 'admin-assets'), { recursive: true, filter: (src) => !src.endsWith('index.html') });
 console.log('Archivos estáticos copiados a public/.');
 
-if (!process.env.DATABASE_URL) {
-  console.error('\nFALTA DATABASE_URL: configúrala en Vercel > Settings > Environment Variables.\n');
+const missing = ['DATABASE_URL', 'DIRECT_URL'].filter((k) => !process.env[k]);
+if (missing.length) {
+  console.error(`\nFALTA ${missing.join(' y ')}: configúrala(s) en Vercel > Settings > Environment Variables (ver docs/PUBLICAR-EN-VERCEL.md, Paso 1).\n`);
   process.exit(1);
 }
 const run = (cmd) => execSync(cmd, { cwd: ROOT, stdio: 'inherit', env: process.env });
+// Se genera aquí también por si el instalador de npm omitió el paso automático de Prisma
+run('npx prisma generate');
 run('npx prisma migrate deploy');
 run('node backend/prisma/seed.js');
 console.log('Build de H-SPOT listo.');

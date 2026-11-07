@@ -13,5 +13,6 @@ Todo esto se cambia desde el panel `/admin` o en `.env`, sin tocar código.
 9. **Guía de tallas.** Las medidas de la guía son de ejemplo (`frontend/js/pages/product.js`, constante `SIZE_GUIDE`). Reemplazar por las medidas reales.
 10. **Productos de demostración.** Los 12 productos demo (marcados "DEMO") deben borrarse o reemplazarse antes del lanzamiento.
 11. **Redes sociales.** Instagram y TikTok están vacíos a propósito. Agregar los enlaces reales en Configuración.
-12. **Dominio y hosting.** Ver `docs/DESPLIEGUE.md`.
+12. **Dominio y hosting.** Ver `docs/PUBLICAR-EN-VERCEL.md`.
+14. **Planes pagos.** Para vender: Vercel Pro (uso comercial) y, cuando haya ventas reales, Supabase Pro (sin pausas por inactividad y con copias de seguridad diarias).
 13. **Almacenamiento de fotos.** Si el hosting no conserva archivos entre despliegues, migrar a Cloudinary o S3.

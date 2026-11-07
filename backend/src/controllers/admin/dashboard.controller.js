@@ -1,4 +1,4 @@
-// Indicadores del panel, calculados con datos reales de MySQL.
+// Indicadores del panel, calculados con datos reales de la base de datos.
 // Diferencia clave:
 //  - "Pedidos web": todo lo que se creó en la tienda (aunque no esté confirmado).
 //  - "Ingresos confirmados": pedidos que el negocio confirmó (y no se cancelaron).

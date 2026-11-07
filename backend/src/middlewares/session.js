@@ -1,4 +1,4 @@
-// Sesiones con cookie HttpOnly. Los datos de la sesión se guardan en MySQL
+// Sesiones con cookie HttpOnly. Los datos de la sesión se guardan en la base de datos
 // (tabla Session), así que no se pierden al reiniciar el servidor.
 const session = require('express-session');
 const prisma = require('../config/prisma');

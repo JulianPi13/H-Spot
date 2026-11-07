@@ -14,6 +14,8 @@ if (!baseUrl || !/_test/.test(baseUrl)) throw new Error('Configura TEST_DATABASE
 
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = baseUrl;
+// Para probar con un "pooler" (como Supabase) puedes separar la conexión de migraciones
+process.env.DIRECT_URL = process.env.TEST_DIRECT_URL || fileEnv.TEST_DIRECT_URL || baseUrl;
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test_secret_' + 'x'.repeat(40);
 process.env.SMTP_HOST = '';
 process.env.DEV_PRINT_EMAIL_LINKS = 'false';
@@ -31,10 +33,8 @@ const request = require('supertest');
 const argon2 = require('argon2');
 
 async function resetDb(prisma) {
-  const tables = await prisma.$queryRawUnsafe("SELECT table_name AS t FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name <> '_prisma_migrations'");
-  await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0');
-  for (const { t } of tables) await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${t}\``);
-  await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
+  const tables = await prisma.$queryRawUnsafe("SELECT tablename AS t FROM pg_tables WHERE schemaname = current_schema() AND tablename <> '_prisma_migrations'");
+  if (tables.length) await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables.map(({ t }) => `"${t}"`).join(', ')} RESTART IDENTITY CASCADE`);
 }
 
 // Catálogo mínimo para las pruebas

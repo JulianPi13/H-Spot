@@ -19,7 +19,7 @@ function buildWhere(q) {
   const from = parseDate(q.desde); const to = parseDate(q.hasta, true);
   if (from || to) where.createdAt = { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) };
   const s = String(q.q || '').trim().slice(0, 80);
-  if (s) where.OR = [{ orderNumber: { contains: s } }, { customerName: { contains: s } }, { email: { contains: s } }, { phone: { contains: s.replace(/\D/g, '') || s } }];
+  if (s) where.OR = [{ orderNumber: { contains: s, mode: 'insensitive' } }, { customerName: { contains: s, mode: 'insensitive' } }, { email: { contains: s, mode: 'insensitive' } }, { phone: { contains: s.replace(/\D/g, '') || s, mode: 'insensitive' } }];
   return where;
 }
 

@@ -2,7 +2,7 @@
 //
 // ESTRATEGIA DE INVENTARIO (explicada simple):
 // 1. Al crear el pedido, el stock se descuenta en una transacción con la condición
-//    "solo si quedan suficientes unidades". MySQL bloquea la fila mientras tanto, así que
+//    "solo si quedan suficientes unidades". La base de datos bloquea la fila mientras tanto, así que
 //    si dos personas compran la última unidad al mismo tiempo, solo una lo logra.
 // 2. El pedido queda "Pendiente de confirmación" con una reserva que vence
 //    (ORDER_RESERVATION_HOURS). Si nadie lo confirma a tiempo, se cancela y el stock vuelve.
@@ -204,8 +204,6 @@ async function releaseStock(tx, order, userId, reason) {
 
 async function changeStatus(orderId, toStatus, { userId = null, note = null } = {}) {
   return prisma.$transaction(async (tx) => {
-    // Bloqueamos la fila del pedido para evitar cambios simultáneos
-    await tx.$queryRaw`SELECT id FROM \`Order\` WHERE id = ${orderId} FOR UPDATE`;
     const order = await tx.order.findUnique({ where: { id: orderId }, include: { items: true } });
     if (!order) throw notFound('Pedido no encontrado.');
     if (order.status === toStatus) return order;
@@ -214,6 +212,9 @@ async function changeStatus(orderId, toStatus, { userId = null, note = null } = 
     }
 
     const data = { status: toStatus };
+    // Solo actualiza si nadie cambió el estado mientras tanto (evita dobles cancelaciones)
+    const res = await tx.order.updateMany({ where: { id: orderId, status: order.status }, data: { status: toStatus } });
+    if (res.count === 0) throw conflict('El pedido cambió mientras tanto. Recarga la página.');
     const wasConfirmed = CONFIRMED_STATES.includes(order.status);
 
     if (toStatus === 'CONFIRMADO') {

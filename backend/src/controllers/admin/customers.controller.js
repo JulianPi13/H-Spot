@@ -11,7 +11,7 @@ async function list(req, res) {
   const limit = 25;
   const q = String(req.query.q || '').trim().slice(0, 80);
   const where = { role: 'CUSTOMER' };
-  if (q) where.OR = [{ fullName: { contains: q } }, { email: { contains: q } }, { phone: { contains: q } }];
+  if (q) where.OR = [{ fullName: { contains: q, mode: 'insensitive' } }, { email: { contains: q, mode: 'insensitive' } }, { phone: { contains: q, mode: 'insensitive' } }];
   const [total, rows] = await Promise.all([
     prisma.user.count({ where }),
     prisma.user.findMany({

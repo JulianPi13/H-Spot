@@ -3,44 +3,46 @@
 Todo se hace desde el navegador, más un programa gratuito para subir la carpeta a GitHub.
 Tiempo aproximado: 40 minutos la primera vez.
 
+> Si en Vercel ya creaste el proyecto y el primer deploy falló con `FALTA DATABASE_URL`, es normal: completa el Paso 1, agrega las variables del Paso 3 y pulsa **Redeploy**.
+
 Vas a usar 3 servicios:
 
 | Servicio | Para qué | Costo |
 |---|---|---|
 | **GitHub** | Guardar el código. Vercel lo toma de ahí. | Gratis |
-| **Aiven** | La base de datos MySQL (pedidos, productos, clientes). | Plan gratis |
+| **Supabase** | La base de datos (pedidos, productos, clientes). | Plan gratis |
 | **Vercel** | Publicar la tienda y guardar las fotos (Vercel Blob). | Gratis para probar. **Para vender se necesita el plan Pro** (ver el final). |
 
 ---
 
-## Paso 1. Crear la base de datos en Aiven
+## Paso 1. Crear la base de datos en Supabase
 
-1. Entra a https://aiven.io y crea una cuenta (puedes usar tu cuenta de Google).
-2. Pulsa **Create service** y elige **MySQL**.
-3. Elige el plan **Free**. En región escoge la más cercana a Estados Unidos (por ejemplo, `do-nyc` o `aws-us-east`).
-4. Ponle de nombre `hspot-db` y pulsa **Create service**. Espera unos minutos hasta que diga **Running**.
-5. En la pestaña **Overview** verás los **Connection information**. Anota:
-   - **Host** (algo como `hspot-db-tunombre.a.aivencloud.com`)
-   - **Port** (un número como `12345`)
-   - **User** (`avnadmin`)
-   - **Password** (pulsa el ojo para verla)
-   - **Database name** (`defaultdb`)
+1. Entra a https://supabase.com y crea una cuenta (puedes entrar con GitHub).
+2. Pulsa **New project**:
+   - **Name:** `hspot`
+   - **Database Password:** inventa una contraseña **solo con letras y números** (sin símbolos como `@`, `#` o `/`, porque rompen la dirección de conexión). Anótala.
+   - **Region:** la más cercana a Colombia (por ejemplo, *East US*).
+   - Pulsa **Create new project** y espera un par de minutos.
+3. Cuando esté listo, pulsa el botón **Connect** (arriba en el proyecto).
+4. Busca la sección **Connection string > URI** y copia dos direcciones:
 
-6. Arma tu **DATABASE_URL** reemplazando los valores en esta plantilla:
+   **a) Transaction pooler** (termina en `:6543/postgres`). Será tu `DATABASE_URL`. Al final agrégale `?pgbouncer=true&connection_limit=1`:
 
-```
-mysql://avnadmin:CONTRASEÑA@HOST:PUERTO/defaultdb?sslaccept=accept_invalid_certs&connection_limit=3
-```
+   ```
+   postgresql://postgres.abcdefghijkl:TU_CONTRASEÑA@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+   ```
 
-Ejemplo (inventado):
+   **b) Session pooler** (igual, pero termina en `:5432/postgres`). Será tu `DIRECT_URL`, tal cual:
 
-```
-mysql://avnadmin:AVNS_abc123XYZ@hspot-db-oscar.a.aivencloud.com:12345/defaultdb?sslaccept=accept_invalid_certs&connection_limit=3
-```
+   ```
+   postgresql://postgres.abcdefghijkl:TU_CONTRASEÑA@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+   ```
 
-Guárdala en un lugar seguro. **Nunca la publiques.**
+   En ambas, cambia `[YOUR-PASSWORD]` por la contraseña del punto 2.
 
-> La conexión va cifrada. `accept_invalid_certs` solo evita tener que instalar el certificado de Aiven.
+Guárdalas en un lugar seguro. **Nunca las publiques.**
+
+> ¿Por qué dos? La tienda usa la primera para atender a muchos clientes a la vez. La segunda solo se usa al publicar, para crear o actualizar las tablas.
 
 ---
 
@@ -62,11 +64,12 @@ Listo: tu código ya está en GitHub, en privado.
 1. Entra a https://vercel.com y regístrate con **Continue with GitHub**.
 2. Pulsa **Add New… > Project** y elige tu repositorio `h-spot` (**Import**).
 3. En **Framework Preset** deja **Other**. No cambies nada de Build ni de Output (el archivo `vercel.json` ya lo trae configurado).
-4. Abre **Environment Variables** y agrega estas, una por una:
+4. Abre **Environment Variables** y agrega estas 6, una por una:
 
 | Nombre | Valor |
 |---|---|
-| `DATABASE_URL` | La que armaste en el Paso 1. |
+| `DATABASE_URL` | La dirección **Transaction pooler** del Paso 1 (puerto 6543, con `?pgbouncer=true&connection_limit=1`). |
+| `DIRECT_URL` | La dirección **Session pooler** del Paso 1 (puerto 5432). |
 | `SESSION_SECRET` | Una frase larga inventada, de al menos 40 caracteres, con letras y números. Ejemplo de forma: `hspot-Bucaramanga-2026-calle45-Q8w3n7Lk2pX9`. **No uses el ejemplo.** |
 | `SETUP_TOKEN` | Otra clave inventada, de al menos 24 caracteres. Sirve para crear tu usuario administrador. |
 | `CRON_SECRET` | Otra clave inventada de al menos 24 caracteres. |
@@ -137,9 +140,10 @@ Ve a Vercel, pestaña **Deployments**, abre el último y mira **Build Logs**. Co
 
 | Mensaje | Solución |
 |---|---|
-| `FALTA DATABASE_URL` | No agregaste la variable del Paso 3. Agrégala y haz Redeploy. |
-| `P1001: Can't reach database server` | Revisa el host y el puerto de Aiven, y que el servicio diga **Running**. |
-| `P1000: Authentication failed` | La contraseña dentro de `DATABASE_URL` no es correcta. |
+| `FALTA DATABASE_URL` o `FALTA DIRECT_URL` | Falta esa variable (Paso 3). Agrégala y haz Redeploy. |
+| `P1001: Can't reach database server` | Revisa que copiaste bien la dirección y que el proyecto de Supabase no esté pausado (en Supabase pulsa **Restore project**). |
+| `P1000: Authentication failed` | La contraseña dentro de la dirección no es correcta. Puedes cambiarla en Supabase: **Project Settings > Database > Reset database password**. |
+| `prepared statement ... already exists` | A `DATABASE_URL` le falta `?pgbouncer=true&connection_limit=1` al final. |
 | La tienda abre pero sin productos | Falta el Blob (Paso 4) o no hiciste Redeploy después de conectarlo. |
 | Las fotos no suben | Revisa que el Blob esté conectado y que la foto pese menos de 4 MB. |
 | "Esta página está desactivada" en `/configuracion-inicial` | Falta `SETUP_TOKEN` (mín. 24 caracteres) o ya creaste el administrador. |
@@ -150,5 +154,6 @@ Ve a Vercel, pestaña **Deployments**, abre el último y mira **Build Logs**. Co
 
 - **Plan para vender:** el plan gratis (Hobby) de Vercel es solo para uso personal, no comercial. Para una tienda que vende necesitas el plan **Pro** (USD 20 al mes por persona que publica, a noviembre de 2026). Puedes armar y probar todo en Hobby y cambiarte a Pro antes de lanzar.
 - **Reservas vencidas:** Vercel ejecuta una vez al día la tarea que cancela pedidos no confirmados. Además, la tienda lo revisa sola cada vez que alguien compra o que tú abres los pedidos en el panel, así que el inventario se mantiene al día.
-- **Base de datos gratis de Aiven:** sirve para empezar (1 GB, con copias de seguridad automáticas), pero Aiven no la recomienda para producción crítica. Cuando la tienda crezca, pasa a un plan pago; solo cambias `DATABASE_URL`.
+- **Supabase gratis:** sirve para empezar, pero **se pausa si pasa una semana sin actividad**; con una tienda en uso no ocurre. El plan gratis no incluye copias de seguridad que puedas descargar: cuando la tienda venda de verdad, conviene el plan Pro de Supabase. Para cambiar de plan no hay que tocar el código.
+- **Ver tus datos:** en Supabase, **Table Editor** muestra pedidos, productos y clientes como una hoja de cálculo. Úsalo para mirar; para cambiar cosas usa el panel `/admin` de la tienda, que valida y registra cada cambio.
 - **Límite de intentos de inicio de sesión:** en Vercel funciona por servidor, así que es menos estricto que en un servidor propio. Las demás protecciones siguen iguales.

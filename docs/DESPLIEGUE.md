@@ -2,7 +2,7 @@
 
 > ¿Prefieres no administrar un servidor? Usa `PUBLICAR-EN-VERCEL.md`.
 
-La forma más sencilla y económica de tener todo bajo control es un **servidor VPS con Ubuntu** (por ejemplo DigitalOcean, Hetzner, Vultr o Contabo), donde viven juntos la tienda, MySQL y las fotos.
+La forma más sencilla y económica de tener todo bajo control es un **servidor VPS con Ubuntu** (por ejemplo DigitalOcean, Hetzner, Vultr o Contabo), donde viven juntos la tienda, PostgreSQL y las fotos.
 
 ## 1. Preparar el servidor (Ubuntu 24.04)
 
@@ -10,11 +10,11 @@ La forma más sencilla y económica de tener todo bajo control es un **servidor 
 sudo apt update && sudo apt upgrade -y
 # Node.js 22
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs mysql-server nginx git
+sudo apt install -y nodejs postgresql nginx git
 sudo npm install -g pm2
 ```
 
-Crea la base y el usuario igual que en el README (paso 2), con una contraseña larga.
+Crea la base y el usuario igual que en el README (paso 2), con una contraseña larga (`sudo -u postgres psql`).
 
 ## 2. Subir el código
 
@@ -33,7 +33,8 @@ NODE_ENV=production
 PORT=3000
 APP_URL=https://tudominio.com
 CORS_ORIGINS=https://tudominio.com
-DATABASE_URL="mysql://hspot:CONTRASEÑA_LARGA@localhost:3306/hspot"
+DATABASE_URL="postgresql://hspot:CONTRASEÑA_LARGA@localhost:5432/hspot"
+DIRECT_URL="postgresql://hspot:CONTRASEÑA_LARGA@localhost:5432/hspot"
 SESSION_SECRET=(clave aleatoria de 96 caracteres)
 DEV_PRINT_EMAIL_LINKS=false
 ```
@@ -86,7 +87,7 @@ Firewall básico:
 sudo ufw allow OpenSSH && sudo ufw allow 'Nginx Full' && sudo ufw enable
 ```
 
-MySQL **no** debe quedar abierto a internet (por defecto solo escucha en `localhost`).
+PostgreSQL **no** debe quedar abierto a internet (por defecto solo escucha en `localhost`).
 
 ## 5. Copias de seguridad
 
@@ -101,7 +102,7 @@ crontab -e
 Agrega (todos los días a las 3 a. m., guarda 14 días):
 
 ```
-0 3 * * * mysqldump --single-transaction -u hspot -p'CONTRASEÑA' hspot | gzip > /var/backups/hspot/db-$(date +\%F).sql.gz
+0 3 * * * PGPASSWORD='CONTRASEÑA' pg_dump -h localhost -U hspot hspot | gzip > /var/backups/hspot/db-$(date +\%F).sql.gz
 15 3 * * * tar -czf /var/backups/hspot/uploads-$(date +\%F).tar.gz -C /var/www/h-spot/backend uploads
 30 3 * * * find /var/backups/hspot -type f -mtime +14 -delete
 ```
@@ -109,7 +110,7 @@ Agrega (todos los días a las 3 a. m., guarda 14 días):
 Copia esos archivos también **fuera del servidor** (Google Drive, otro servidor, S3). Para restaurar:
 
 ```bash
-gunzip < db-2026-11-07.sql.gz | mysql -u hspot -p hspot
+gunzip < db-2026-11-07.sql.gz | psql -h localhost -U hspot hspot
 ```
 
 ## 6. Actualizar la tienda
@@ -121,7 +122,7 @@ npm ci && npm run db:migrate && pm2 restart hspot
 
 ## 7. Alternativa: plataformas administradas
 
-Railway, Render o similares también sirven (Node + MySQL administrado). Ojo: muchas borran los archivos del disco en cada despliegue. Si usas una de esas, monta un **volumen persistente** para `backend/uploads` o cambia `src/services/storage.service.js` para usar Cloudinary o S3.
+Railway, Render o similares también sirven (Node + PostgreSQL administrado). Ojo: muchas borran los archivos del disco en cada despliegue. Si usas una de esas, monta un **volumen persistente** para `backend/uploads` o cambia `src/services/storage.service.js` para usar Cloudinary o S3.
 
 ## 8. Lista antes de lanzar
 

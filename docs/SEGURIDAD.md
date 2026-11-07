@@ -3,13 +3,13 @@
 | Riesgo | Cómo se protege | Dónde |
 |---|---|---|
 | Contraseñas robadas | Argon2id (no se pueden revertir). | `controllers/auth.controller.js` |
-| Robo de sesión | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` en producción; nuevo identificador al iniciar sesión; sesiones guardadas en MySQL y cerradas de verdad al salir. | `middlewares/session.js` |
+| Robo de sesión | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` en producción; nuevo identificador al iniciar sesión; sesiones guardadas en la base de datos y cerradas de verdad al salir. | `middlewares/session.js` |
 | Formularios enviados desde otros sitios (CSRF) | Token en cada POST/PUT/PATCH/DELETE. | `middlewares/csrf.js` |
 | Fuerza bruta | Límite de intentos de login (10 / 15 min), registro, recuperación y pedidos. | `middlewares/rateLimits.js` |
 | Adivinar si un correo existe | Mismo mensaje y mismo tiempo de respuesta en login y recuperación. | `auth.controller.js` |
 | Acceso al panel | El servidor verifica el rol ADMIN en cada ruta `/api/admin`. Ocultar botones no es la protección. | `middlewares/auth.js`, `routes/admin.routes.js` |
-| Precios manipulados | El navegador solo envía qué y cuánto; precios, descuentos, envío y totales se calculan con MySQL. | `services/pricing.service.js` |
-| Vender dos veces la última prenda | Descuento atómico con condición de stock dentro de una transacción. | `services/order.service.js` |
+| Precios manipulados | El navegador solo envía qué y cuánto; precios, descuentos, envío y totales se calculan con la base de datos. | `services/pricing.service.js` |
+| Vender dos veces la última prenda | Descuento atómico con condición de stock dentro de una transacción (probado también a través del pooler de Supabase). | `services/order.service.js` |
 | Pedidos duplicados | Clave única por intento + botón bloqueado mientras se envía. | `Order.idempotencyKey`, `checkout.js` |
 | Inyección SQL | Prisma usa consultas parametrizadas. | todo el backend |
 | XSS (código malicioso en textos) | Todo texto se escapa al mostrarse (`html` en `dom.js`); política de contenido (CSP) que bloquea scripts externos o en línea; las URL de ajustes solo aceptan `https://` o rutas internas. | `frontend/js/core/dom.js`, `src/app.js` |

@@ -96,7 +96,7 @@ async function evaluatePromotion(code, subtotal, db = prisma) {
 
 // Calcula envío y total. Si no hay método de envío elegido/definido, el envío queda "por confirmar".
 async function computeTotals({ subtotal, shippingMethodId, promoCode }, db = prisma) {
-  const checkout = await getSetting('checkout');
+  const checkout = await getSetting('checkout', db);
   const { promotion, discount } = await evaluatePromotion(promoCode, subtotal, db);
   const methods = await db.shippingMethod.findMany({ where: { active: true }, orderBy: { sortOrder: 'asc' } });
 

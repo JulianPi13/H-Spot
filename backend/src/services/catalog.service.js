@@ -49,7 +49,7 @@ function toCard(p) {
 function buildWhere(f) {
   const AND = [{ active: true }, { category: { active: true } }];
   if (f.q) {
-    AND.push({ OR: [{ name: { contains: f.q } }, { description: { contains: f.q } }] });
+    AND.push({ OR: [{ name: { contains: f.q, mode: 'insensitive' } }, { description: { contains: f.q, mode: 'insensitive' } }] });
   }
   if (f.categoria) AND.push({ category: { slug: f.categoria } });
   if (f.genero) AND.push({ gender: { in: f.genero === 'UNISEX' ? ['UNISEX'] : [f.genero, 'UNISEX'] } });

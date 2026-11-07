@@ -134,7 +134,7 @@ test('envío y promociones configurables se aplican en el servidor', async () =>
   await prisma.shippingMethod.deleteMany();
 });
 
-test('los pedidos persisten en MySQL (sobreviven a un "reinicio" de la app)', async () => {
+test('los pedidos persisten en la base de datos (sobreviven a un "reinicio" de la app)', async () => {
   const count = await prisma.order.count();
   createApp(); // nueva instancia, mismos datos
   assert.equal(await prisma.order.count(), count);

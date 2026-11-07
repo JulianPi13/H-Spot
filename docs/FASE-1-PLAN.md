@@ -21,16 +21,16 @@ Navegador (HTML + CSS + JavaScript)
 Servidor Node.js + Express  ── valida, calcula precios, controla permisos
         │  Prisma (ORM)
         ▼
-MySQL  ── usuarios, productos, variantes, inventario, pedidos, ajustes, auditoría
+PostgreSQL (Supabase) ── usuarios, productos, variantes, inventario, pedidos, ajustes, auditoría
 ```
 
 - **Un solo servidor** entrega la tienda y la API. Así las cookies funcionan sin complicaciones y no hay problemas de CORS.
-- El navegador **nunca decide** precios, stock ni permisos: todo lo calcula el servidor con datos de MySQL.
-- Las sesiones se guardan en MySQL, así que un reinicio del servidor no cierra la sesión de nadie.
+- El navegador **nunca decide** precios, stock ni permisos: todo lo calcula el servidor con datos de la base de datos.
+- Las sesiones se guardan en la base de datos, así que un reinicio del servidor no cierra la sesión de nadie.
 - Las fotos se convierten a WebP y se guardan en **Vercel Blob** cuando la tienda corre en Vercel, o en la carpeta `backend/uploads` en un computador o servidor propio. Todo está aislado en `storage.service.js`.
 - En Vercel, la tienda completa corre como una función (`api/index.js`) y los archivos estáticos salen de su CDN. No hay procesos de fondo: las reservas vencidas se liberan con una tarea diaria (Vercel Cron) y cada vez que alguien compra o abre los pedidos.
 
-**Única diferencia con la propuesta original:** no se usó React ni otro framework. Se mantuvo HTML, CSS y JavaScript puros, como pedía el documento, organizados en módulos pequeños.
+**Diferencias con la propuesta original:** la base de datos es PostgreSQL en Supabase en lugar de MySQL (decisión del negocio, para publicar en Vercel); Prisma hace que el código sea casi igual. Tampoco se usó React ni otro framework. Se mantuvo HTML, CSS y JavaScript puros, como pedía el documento, organizados en módulos pequeños.
 
 ## 3. Modelo de datos (tablas)
 
@@ -63,7 +63,7 @@ El esquema completo y comentado está en `backend/prisma/schema.prisma`.
 
 ## 4. Inventario sin vender dos veces la misma prenda
 
-- Al crear el pedido, el servidor descuenta el stock con una sola orden a MySQL que dice: *"resta solo si quedan suficientes"*. MySQL bloquea esa fila mientras tanto: si dos personas compran la última unidad al mismo tiempo, una lo logra y la otra recibe un aviso. (Probado automáticamente.)
+- Al crear el pedido, el servidor descuenta el stock con una sola orden a la base de datos que dice: *"resta solo si quedan suficientes"*. La base de datos bloquea esa fila mientras tanto: si dos personas compran la última unidad al mismo tiempo, una lo logra y la otra recibe un aviso. (Probado automáticamente.)
 - El pedido queda **Pendiente de confirmación** con una **reserva de 48 horas** (configurable). Si nadie lo confirma, se cancela solo y el stock vuelve.
 - Si el administrador cancela, el stock vuelve automáticamente. Todo queda en `InventoryMovement`.
 
@@ -112,7 +112,7 @@ h-spot/
 
 | Servicio | ¿Obligatorio? | Estado |
 |---|---|---|
-| MySQL 8 | Sí | Requerido para todo. |
+| PostgreSQL (Supabase) | Sí | Requerido para todo. En Vercel se usa el pooler de Supabase (`DATABASE_URL`) y una conexión aparte para migraciones (`DIRECT_URL`). |
 | WhatsApp (enlace wa.me) | Sí | No necesita cuenta ni clave. Número: 573013223892. |
 | Servidor de correo SMTP | No | Necesario para recuperar contraseña y verificar correos. **No configurado**: la tienda lo indica claramente y no finge enviar correos. |
 | Almacenamiento de fotos externo (Cloudinary/S3) | No | Hoy se usa el disco del servidor. Recomendado si el hosting no tiene disco permanente. |

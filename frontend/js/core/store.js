@@ -3,7 +3,7 @@
 // CARRITO:
 //  - Invitado: se guarda en el navegador (localStorage) SOLO como lista de
 //    { variantId, quantity }. Precios y stock siempre se piden al servidor.
-//  - Con sesión: se guarda en el servidor (MySQL).
+//  - Con sesión: se guarda en el servidor (base de datos).
 //  - Al iniciar sesión, el carrito del invitado se combina con el de la cuenta.
 import { api, setCsrf } from './api.js';
 

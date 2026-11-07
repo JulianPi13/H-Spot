@@ -37,7 +37,7 @@ async function list(req, res) {
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = 20;
   const where = {};
-  if (q) where.OR = [{ name: { contains: q } }, { slug: { contains: q } }, { variants: { some: { sku: { contains: q } } } }];
+  if (q) where.OR = [{ name: { contains: q, mode: 'insensitive' } }, { slug: { contains: q, mode: 'insensitive' } }, { variants: { some: { sku: { contains: q, mode: 'insensitive' } } } }];
   if (req.query.estado === 'activos') where.active = true;
   if (req.query.estado === 'inactivos') where.active = false;
   if (req.query.categoria) where.categoryId = Number(req.query.categoria) || undefined;
@@ -175,13 +175,15 @@ async function adjustStock(req, res) {
   const vid = id(req.params.variantId);
   const { mode, value, reason } = req.valid.body;
   const result = await prisma.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT id FROM ProductVariant WHERE id = ${vid} FOR UPDATE`;
     const v = await tx.productVariant.findUnique({ where: { id: vid } });
     if (!v) throw notFound('Variante no encontrada.');
     const newStock = mode === 'set' ? value : v.stock + value;
     if (newStock < 0) throw badRequest('El stock no puede quedar negativo.');
     const delta = newStock - v.stock;
-    const updated = await tx.productVariant.update({ where: { id: vid }, data: { stock: newStock } });
+    // Solo guarda si nadie vendió o ajustó esa variante en este mismo instante
+    const res = await tx.productVariant.updateMany({ where: { id: vid, stock: v.stock }, data: { stock: newStock } });
+    if (res.count === 0) throw conflict('El stock cambió en este momento (quizás entró un pedido). Recarga e inténtalo de nuevo.');
+    const updated = await tx.productVariant.findUnique({ where: { id: vid } });
     if (delta !== 0) {
       await tx.inventoryMovement.create({ data: { variantId: vid, type: 'AJUSTE_ADMIN', quantity: delta, stockAfter: newStock, userId: req.user.id, reason } });
     }

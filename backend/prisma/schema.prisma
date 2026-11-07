@@ -1,6 +1,6 @@
 // =============================================================
-// H-SPOT — Modelo de datos (Prisma + MySQL)
-// Cada "model" se convierte en una tabla de MySQL.
+// H-SPOT — Modelo de datos (Prisma + PostgreSQL / Supabase)
+// Cada "model" se convierte en una tabla de la base de datos.
 // Los precios usan Decimal para evitar errores de redondeo (COP).
 // =============================================================
 
@@ -9,8 +9,11 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // DATABASE_URL: conexión que usa la tienda (en Supabase: "Transaction pooler", puerto 6543)
+  // DIRECT_URL: conexión para crear/actualizar tablas (en Supabase: "Session pooler", puerto 5432)
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------- Enumeraciones (valores fijos permitidos) ----------
@@ -132,7 +135,7 @@ model EmailVerificationToken {
   @@index([userId])
 }
 
-// Sesiones de inicio de sesión guardadas en MySQL (sobreviven a reinicios)
+// Sesiones de inicio de sesión guardadas en la base de datos (sobreviven a reinicios)
 model Session {
   id        String   @id @db.VarChar(128)
   data      String   @db.Text
@@ -202,11 +205,9 @@ model Product {
   @@index([categoryId])
   @@index([gender])
   @@index([price])
-  @@fulltext([name, description])
 }
 
-// Tabla intermedia producto <-> colección (con llave primaria propia,
-// requerida por proveedores de MySQL como Aiven)
+// Tabla intermedia producto <-> colección (muchos a muchos)
 model ProductCollection {
   productId    Int
   collectionId Int
